@@ -21,12 +21,91 @@ def scrape_website(url: str) -> dict:
             # get image urls
             image_urls = page.eval_on_selector_all('img', 'els => els.map(el => el.src)')
 
+            # company name
+            company_name_locater = page.locator('meta[property="og:site_name"]')
+            company_name = company_name_locater.get_attribute('content') if company_name_locater.count() > 0 else None
+
+            # logo urls
+            # TODO: improve svg extraction - ex: https://nvidia.com
+            logo_urls = page.eval_on_selector_all(
+                'img[alt*="logo"], img[src*="logo"], img[class*="logo"], span[class*="logo"] svg',
+                '''
+                els => els.map(el => {
+                    let url = el.getAttribute('src') || el.getAttribute('href');
+                    if (!url) {
+                        const svg = new XMLSerializer().serializeToString(el);
+                        url = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+                    }
+                    return url;
+                })
+                '''
+            )
+
+            # brand colors = colors used in the website buttons, headers, and links
+            # TODO: improve brand colors extraction - perhaps use of color by element type? frequency?
+            brand_colors = page.eval_on_selector_all(
+                'button, h1, h2, a',
+                '''
+                (elements) => {
+                function colorToHex(color) {
+                    if (color.startsWith('#')) return color;
+                    color = color.replace(/\\s/g, '').toLowerCase();
+                    if (color.startsWith('rgb')) {
+                    const rgbValues = color.match(/\\d+/g).slice(0, 3);
+                    const hexValues = rgbValues.map((value) => {
+                        const hex = parseInt(value).toString(16);
+                        return hex.length === 1 ? '0' + hex : hex;
+                    });
+                    return '#' + hexValues.join('');
+                    }
+                    return null;
+                }
+
+                const colors = [];
+                elements.forEach((el) => {
+                    const styles = window.getComputedStyle(el);
+                    const bgColor = colorToHex(styles.backgroundColor);
+                    const fontColor = colorToHex(styles.color);
+                    if (bgColor && !colors.includes(bgColor)) colors.push(bgColor);
+                    if (fontColor && !colors.includes(fontColor)) colors.push(fontColor);
+                });
+                return colors;
+                }
+                '''
+            )
+
+            # fonts
+            # TODO: improve font extraction = see razer.com and allbirds.com
+            fonts = page.eval_on_selector_all(
+                'link[type="font/woff2"], link[type="font/woff"], link[type="font/otf"], link[type="font/ttf"], style[href*="font"]',
+                'els => els.map(el => el.href)'
+            )
+
+            # social media links
+            social_media_links = page.eval_on_selector_all(
+                'a[href*="facebook"], a[href*="twitter"], a[href*="instagram"], a[href*="linkedin"], a[href*="youtube"]',
+                '''
+                els => els.map(el => {
+                    let url = el.getAttribute('href');
+                    if (url.includes('youtube.com/watch')) {
+                        return null;
+                    }
+                    return url;
+                }).filter(url => url !== null)
+                '''
+            )
+
             return {
+                "company_name": company_name,
                 "title": title,
                 "description": description,
                 "og_title": og_title,
                 "og_description": og_description,
-                "image_urls": image_urls
+                # "image_urls": image_urls,
+                "logo_urls": logo_urls,
+                "social_media_links": social_media_links,
+                "brand_colors": brand_colors,
+                "fonts": fonts
             }
             
         except Exception as e:
