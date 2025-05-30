@@ -94,20 +94,30 @@ def scrape_website(url: str) -> dict:
                 }).filter(url => url !== null)
                 '''
             )
+            
+            # userland text
+            text_content = page.eval_on_selector_all(
+                'p, h1, h2, h3, h4, h5, h6',
+                'els => els.map(el => el.textContent.trim()).join("\\n")'
+            )
 
             return {
                 "company_name": company_name,
+                "website_url": url,
                 "title": title,
                 "description": description,
                 "og_title": og_title,
                 "og_description": og_description,
                 # "image_urls": image_urls,
-                "logo_urls": logo_urls,
-                "social_media_links": social_media_links,
+                # "logo_urls": logo_urls,
+                # "social_media_links": social_media_links,
                 "brand_colors": brand_colors,
-                "fonts": fonts
+                # "fonts": fonts,
+                "text_content": text_content
             }
             
+            
+
         except Exception as e:
             print(f"[Scraper Error] {e}")
             return {"error": str(e)}
