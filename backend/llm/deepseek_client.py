@@ -1,13 +1,13 @@
+import os
 from openai import OpenAI
 from dotenv import load_dotenv
 from backend.llm.base import LLMClient
-import os
 
-class OpenAIClient(LLMClient):
-    def __init__(self, model: str = "gpt-4o-mini"):
+class DeepSeekClient(LLMClient):
+    def __init__(self, model: str = "deepseek-chat"):
         load_dotenv()
         self.model = model
-        self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        self.client = OpenAI(api_key=os.getenv("DEEPSEEK_API_KEY"), base_url="https://api.deepseek.com")
     
     def generate(self, prompt: str) -> str:
         response = self.client.chat.completions.create(

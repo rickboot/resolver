@@ -1,5 +1,5 @@
 from playwright.sync_api import sync_playwright
-from backend.llm.openai_analyzer import analyze_target_audience, analyze_writing_style
+from backend.llm.llm_analyzer import analyze_target_audience, analyze_writing_style
 from backend.llm.base import LLMClient
 
 def scrape_website(url: str, llm_client: LLMClient) -> dict:
