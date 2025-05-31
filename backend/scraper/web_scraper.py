@@ -106,8 +106,12 @@ def scrape_website(url: str, llm_client: LLMClient) -> dict:
 
             # analyze writing style and target audience
             meta_text = company_name + "\n\n" + description + "\n\n" + og_description + "\n\n"
-            target_audience = analyze_target_audience(meta_text + "\n\n" + page_text, llm_client)
-            writing_style = analyze_writing_style(page_text, llm_client)
+            try:
+                target_audience = analyze_target_audience(meta_text + "\n\n" + page_text, llm_client)
+                writing_style = analyze_writing_style(page_text, llm_client)
+            except Exception as llm_error:
+                print(f"[LLM Error] {llm_error}")
+                return {"error": f"LLM failed: {str(llm_error)}"}
 
             # Deduplicate social_media_links and brand_colors
             unique_social_media_links = list(set(social_media_links)) if social_media_links else []
