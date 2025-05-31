@@ -1,20 +1,4 @@
-import os
-import openai
-from dotenv import load_dotenv
 from backend.llm.base import LLMClient
-
-load_dotenv()
-openai.api_key = os.getenv("OPENAI_API_KEY")
-
-def call_llm(prompt: str) -> str:
-    response = openai.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {"role": "user", "content": prompt}
-        ]
-    )
-    return response.choices[0].message.content.strip()
-
 
 def analyze_writing_style(text: str, llm: LLMClient) -> str:
     prompt = (
