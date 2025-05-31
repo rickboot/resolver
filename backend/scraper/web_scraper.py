@@ -8,11 +8,15 @@ def scrape_website(url: str) -> dict:
         try:
             page.goto(url, timeout=30000, wait_until="domcontentloaded")
 
-            # get page metadata
+            # get page metadata - title, company name, description
             title = page.title()
+            company_name_locater = page.locator('meta[property="og:site_name"]')
+            company_name = company_name_locater.get_attribute('content') if company_name_locater.count() > 0 else None
+
             desc_locator = page.locator('meta[name="description"]')
             description = desc_locator.get_attribute('content') if desc_locator.count() > 0 else None
 
+            # og title and description
             og_title_locator = page.locator('meta[property="og:title"]')
             og_title = og_title_locator.get_attribute('content') if og_title_locator.count() > 0 else None
 
@@ -21,10 +25,6 @@ def scrape_website(url: str) -> dict:
 
             # get image urls
             image_urls = page.eval_on_selector_all('img', 'els => els.map(el => el.src)')
-
-            # company name
-            company_name_locater = page.locator('meta[property="og:site_name"]')
-            company_name = company_name_locater.get_attribute('content') if company_name_locater.count() > 0 else None
 
             # logo urls
             # TODO: improve svg extraction - ex: https://nvidia.com
@@ -88,7 +88,7 @@ def scrape_website(url: str) -> dict:
                 '''
                 els => els.map(el => {
                     let url = el.getAttribute('href');
-                    if (url.includes('youtube.com/watch')) {
+                    if (url.includes('youtube.com/watch') || url.includes('youtube.com/channel')) {
                         return null;
                     }
                     return url;
@@ -102,25 +102,30 @@ def scrape_website(url: str) -> dict:
                 'els => els.map(el => el.textContent.trim()).join("\\n")'
             )
 
+            # analyze writing style and target audience
+            meta_text = company_name + "\n\n" + description + "\n\n" + og_description + "\n\n"
+            target_audience = analyze_target_audience(meta_text + "\n\n" + page_text)
+
             writing_style = analyze_writing_style(page_text)
 
-            target_audience = analyze_target_audience(page_text)
-
+            # Deduplicate social_media_links and brand_colors
+            unique_social_media_links = list(set(social_media_links)) if social_media_links else []
+            unique_brand_colors = list(set(brand_colors)) if brand_colors else []
 
             return {
                 "company_name": company_name,
                 "website_url": url,
-                # "title": title,
-                # "description": description,
                 "og_title": og_title,
                 "og_description": og_description,
-                # "image_urls": image_urls,
-                # "logo_urls": logo_urls,
-                # "social_media_links": social_media_links,
-                "brand_colors": brand_colors,
-                # "fonts": fonts,
+                "social_media_links": unique_social_media_links,
+                "brand_colors": unique_brand_colors,
                 "writing_style": writing_style,
                 "target_audience": target_audience
+                # "title": title,
+                # "description": description,
+                # "image_urls": image_urls,
+                # "logo_urls": logo_urls,
+                # "fonts": fonts,
             }
             
             
