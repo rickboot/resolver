@@ -1,10 +1,12 @@
 from playwright.sync_api import sync_playwright
 from backend.llm.openai_analyzer import analyze_target_audience, analyze_writing_style
+from backend.llm.base import LLMClient
 
-def scrape_website(url: str) -> dict:
+def scrape_website(url: str, llm_client: LLMClient) -> dict:
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         page = browser.new_page()
+
         try:
             page.goto(url, timeout=30000, wait_until="domcontentloaded")
 
@@ -104,9 +106,8 @@ def scrape_website(url: str) -> dict:
 
             # analyze writing style and target audience
             meta_text = company_name + "\n\n" + description + "\n\n" + og_description + "\n\n"
-            target_audience = analyze_target_audience(meta_text + "\n\n" + page_text)
-
-            writing_style = analyze_writing_style(page_text)
+            target_audience = analyze_target_audience(meta_text + "\n\n" + page_text, llm_client)
+            writing_style = analyze_writing_style(page_text, llm_client)
 
             # Deduplicate social_media_links and brand_colors
             unique_social_media_links = list(set(social_media_links)) if social_media_links else []
