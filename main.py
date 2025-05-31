@@ -1,5 +1,5 @@
 from backend.scraper.web_scraper import scrape_website
-from backend.llm.openai_analyzer import analyze_text
+from backend.llm.openai_analyzer import analyze_writing_style, analyze_target_audience
 import sys
 
 def main():
@@ -12,14 +12,10 @@ def main():
         print("Scrape failed: {scrape_result['error']}")
         return
 
-    # print("Scraped data:")
-    # for key, value in scrape_result.items():
-    #     print(f"{key}: {value}")
-
-
-    analyze_result = analyze_text(scrape_result['text_content'])
-    print("Analyzed data:")
-    print(analyze_result)
+    print("\n\n=======Scraped data=======\n\n")
+    for key, value in scrape_result.items():
+        print(f"{key}:\n{value}\n\n")
+    print("==========================\n\n")
 
 if __name__ == "__main__":
     main()

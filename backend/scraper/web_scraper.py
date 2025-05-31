@@ -1,4 +1,5 @@
 from playwright.sync_api import sync_playwright
+from backend.llm.openai_analyzer import analyze_target_audience, analyze_writing_style
 
 def scrape_website(url: str) -> dict:
     with sync_playwright() as p:
@@ -96,16 +97,21 @@ def scrape_website(url: str) -> dict:
             )
             
             # userland text
-            text_content = page.eval_on_selector_all(
+            page_text = page.eval_on_selector_all(
                 'p, h1, h2, h3, h4, h5, h6',
                 'els => els.map(el => el.textContent.trim()).join("\\n")'
             )
 
+            writing_style = analyze_writing_style(page_text)
+
+            target_audience = analyze_target_audience(page_text)
+
+
             return {
                 "company_name": company_name,
                 "website_url": url,
-                "title": title,
-                "description": description,
+                # "title": title,
+                # "description": description,
                 "og_title": og_title,
                 "og_description": og_description,
                 # "image_urls": image_urls,
@@ -113,7 +119,8 @@ def scrape_website(url: str) -> dict:
                 # "social_media_links": social_media_links,
                 "brand_colors": brand_colors,
                 # "fonts": fonts,
-                "text_content": text_content
+                "writing_style": writing_style,
+                "target_audience": target_audience
             }
             
             
