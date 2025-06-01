@@ -105,7 +105,7 @@ def scrape_website(url: str, llm_client: LLMClient) -> dict:
             )
 
             # analyze writing style and target audience
-            meta_text = company_name + "\n\n" + description + "\n\n" + og_description + "\n\n"
+            meta_text = (company_name or "") + "\n\n" + (og_description or "")
             try:
                 target_audience = analyze_target_audience(meta_text + "\n\n" + page_text, llm_client)
                 writing_style = analyze_writing_style(page_text, llm_client)
@@ -118,22 +118,20 @@ def scrape_website(url: str, llm_client: LLMClient) -> dict:
             unique_brand_colors = list(set(brand_colors)) if brand_colors else []
 
             return {
-                "company_name": company_name,
+                "company_name": locals().get("company_name", ""),
                 "website_url": url,
-                "og_title": og_title,
-                "og_description": og_description,
-                "social_media_links": unique_social_media_links,
-                "brand_colors": unique_brand_colors,
-                "writing_style": writing_style,
-                "target_audience": target_audience
-                # "title": title,
-                # "description": description,
-                # "image_urls": image_urls,
-                # "logo_urls": logo_urls,
-                # "fonts": fonts,
+                "title": locals().get("title", ""),
+                "description": locals().get("description", ""),
+                "og_title": locals().get("og_title", ""),
+                "og_description": locals().get("og_description", ""),
+                "brand_colors": locals().get("unique_brand_colors", []),
+                "writing_style": locals().get("writing_style", ""),
+                "target_audience": locals().get("target_audience", ""),
+                "social_media_links": locals().get("unique_social_media_links", []),
+                "image_urls": locals().get("image_urls", []),
+                "logo_urls": locals().get("logo_urls", []),
+                "fonts": locals().get("fonts", []),            
             }
-            
-            
 
         except Exception as e:
             print(f"[Scraper Error] {e}")

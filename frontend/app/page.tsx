@@ -50,6 +50,10 @@ export default function Home() {
               <p className="mt-2">{result.url}</p>
               <p className="mt-2">{result.target_audience}</p>
               <p className="mt-2">{result.writing_style}</p>
+              <p className="mt-2">{result.title}</p>
+              <p className="mt-2">{result.description}</p>
+              <p className="mt-2">{result.og_title}</p>
+              <p className="mt-2">{result.og_description}</p>
             </div>
           )}
         </div>
@@ -59,15 +63,3 @@ export default function Home() {
     </div>
   );
 }
-
-
-/*
-  "company_name": company_name,
-  "website_url": url,
-  "og_title": og_title,
-  "og_description": og_description,
-  "social_media_links": unique_social_media_links,
-  "brand_colors": unique_brand_colors,
-  "writing_style": writing_style,
-  "target_audience": target_audience
-*/
