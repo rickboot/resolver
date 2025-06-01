@@ -24,7 +24,7 @@ export default function Home() {
       const data = await response.json();
       setResult(data);
     } catch (err) {
-      setResult({error: err});
+      setResult({error: (err as Error).message || 'Unknown error'});
     }
     finally {
     setLoading(false);
@@ -40,20 +40,21 @@ export default function Home() {
             <h1 className="text-4xl font-bold">Resolver</h1>
             <h2 className="text-xl">On-brand Marketing Content Creation</h2>
             <label htmlFor="website-url" className="mt-4 text-black">Website URL</label>
-            <input id="website-url" placeholder='https://example.com' type="url" className="border border-gray-300 rounded w-64 p-2 bg-foreground text-black" onChange={(e) => setUrl(e.target.value)}/>
+            <input id="website-url" placeholder='https://example.com' type="url" className="border border-gray-300 rounded w-64 p-2 bg-foreground text-black text-center" onChange={(e) => setUrl(e.target.value)}/>
             <button disabled={loading || !url} className="disabled:opacity-50 mt-4 px-4 py-2 bg-[var(--button-color)] text-black rounded" type="submit">{loading ? 'Loading...' : 'Submit'}</button>    
           </form>
           {result && (
             <div className="mt-12 text-black w-96 text-center">
               <h2 className="font-bold text-lg">Brand Information</h2>
               <p className="mt-2" >{result.company_name}</p>
-              <p className="mt-2">{result.url}</p>
+              <p className="mt-2">{result.website_url}</p>
               <p className="mt-2">{result.target_audience}</p>
               <p className="mt-2">{result.writing_style}</p>
               <p className="mt-2">{result.title}</p>
               <p className="mt-2">{result.description}</p>
               <p className="mt-2">{result.og_title}</p>
               <p className="mt-2">{result.og_description}</p>
+              <p className="mt-2">{result.brand_colors.map((color: string) => color).join(", ")}</p>
             </div>
           )}
         </div>

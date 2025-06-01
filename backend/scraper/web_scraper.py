@@ -130,7 +130,7 @@ def scrape_website(url: str, llm_client: LLMClient) -> dict:
                 "social_media_links": locals().get("unique_social_media_links", []),
                 "image_urls": locals().get("image_urls", []),
                 "logo_urls": locals().get("logo_urls", []),
-                "fonts": locals().get("fonts", []),            
+                "fonts": locals().get("fonts", []),  
             }
 
         except Exception as e:

@@ -39,5 +39,11 @@ def analyze(request: ScrapeRequest):
         "og_title": scraped.get("og_title"),
         "og_description": scraped.get("og_description"),
         "target_audience": scraped.get("target_audience"),
-        "writing_style": scraped.get("writing_style")
+        "writing_style": scraped.get("writing_style"),
+        "website_url": scraped.get("website_url"),
+        "brand_colors": scraped.get("brand_colors"),
+        "social_media_links": scraped.get("social_media_links"),
+        "image_urls": scraped.get("image_urls"),
+        "logo_urls": scraped.get("logo_urls"),
+        "fonts": scraped.get("fonts")
     }
