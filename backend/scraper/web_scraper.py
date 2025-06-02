@@ -1,6 +1,7 @@
 from playwright.sync_api import sync_playwright
 from backend.llm.llm_analyzer import analyze_target_audience, analyze_writing_style
 from backend.llm.base import LLMClient
+from backend.scraper.group_text_blocks import group_text_blocks
 
 def scrape_website(url: str, llm_client: LLMClient) -> dict:
     with sync_playwright() as p:
@@ -105,13 +106,11 @@ def scrape_website(url: str, llm_client: LLMClient) -> dict:
                 }))'''
             )
 
-            print('element_text_pairs', element_text_pairs)
-            # element_text_pairs = page.eval_on_selector_all(
-            #     'p, h1, h2, h3, h4, h5, h6',
-            #     'els => els.map(el => el.textContent.trim()).join("\\n")'
-            # )
-
-            print('element_text_pairs', element_text_pairs)
+            #! test
+            grouped_text_blocks = group_text_blocks(element_text_pairs)
+            print('=== grouped_text_blocks ===')
+            for block in grouped_text_blocks:
+                print(block, "\n")
 
             return {
                 "company_name": company_name,

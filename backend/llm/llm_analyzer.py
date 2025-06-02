@@ -21,7 +21,15 @@ def generate_brand_summary(scraped: dict, llm: LLMClient) -> dict:
         meta_text = (
             (scraped.get("company_name") or "") + "\n\n" +
             (scraped.get("og_description") or "") + "\n\n" +
-            "\n\n".join(filter(None, map(lambda x: x.get("text"), scraped.get("element_text_pairs") or [])))
+            "\n\n".join(
+                filter(
+                    None,
+                    map(
+                        lambda x: (x.get("header", {}).get("header-text", "") + "\n\n" + x.get("body-text", "")),
+                        scraped.get("element_text_pairs") or []
+                    )
+    )
+)
         )
 
         writing_style = analyze_writing_style(meta_text, llm)
