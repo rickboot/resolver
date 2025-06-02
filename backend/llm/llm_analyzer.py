@@ -14,3 +14,26 @@ def analyze_target_audience(text: str, llm: LLMClient) -> str:
         "Consider factors like demographics (age, income, location), interests, and needs."
     )
     return llm.generate(prompt + "\n\n" + text)
+
+
+def generate_brand_summary(scraped: dict, llm: LLMClient) -> dict:
+    try:
+        meta_text = (
+            (scraped.get("company_name") or "") + "\n\n" +
+            (scraped.get("og_description") or "") + "\n\n" +
+            (scraped.get("page_text") or "")
+        )
+
+        writing_style = analyze_writing_style(meta_text, llm)
+        target_audience = analyze_target_audience(meta_text, llm)
+
+        return {
+            **scraped,
+            "writing_style": writing_style,
+            "target_audience": target_audience
+        }
+    except Exception as e:
+        print(f"Failed to generate brand summary with LLM: {str(e)}")
+        return {
+            "error": str(e)
+        }

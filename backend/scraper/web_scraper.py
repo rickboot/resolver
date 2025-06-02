@@ -81,20 +81,18 @@ def scrape_website(url: str, llm_client: LLMClient) -> dict:
             # TODO: improve font extraction = see razer.com and allbirds.com
             fonts = page.eval_on_selector_all(
                 'link[type="font/woff2"], link[type="font/woff"], link[type="font/otf"], link[type="font/ttf"], style[href*="font"]',
-                'els => els.map(el => el.href)'
+                'els => Array.from(new Set(els.map(el => el.href)))'
             )
 
             # social media links
             social_media_links = page.eval_on_selector_all(
                 'a[href*="facebook"], a[href*="twitter"], a[href*="instagram"], a[href*="linkedin"], a[href*="youtube"]',
                 '''
-                els => els.map(el => {
-                    let url = el.getAttribute('href');
-                    if (url.includes('youtube.com/watch') || url.includes('youtube.com/channel')) {
-                        return null;
-                    }
-                    return url;
-                }).filter(url => url !== null)
+                els => Array.from(new Set(
+                    els
+                    .map(link => link.getAttribute('href'))
+                    .filter(url => url !== null)
+                ))
                 '''
             )
             
@@ -104,19 +102,6 @@ def scrape_website(url: str, llm_client: LLMClient) -> dict:
                 'els => els.map(el => el.textContent.trim()).join("\\n")'
             )
 
-            # analyze writing style and target audience
-            meta_text = (company_name or "") + "\n\n" + (og_description or "")
-            try:
-                target_audience = analyze_target_audience(meta_text + "\n\n" + page_text, llm_client)
-                writing_style = analyze_writing_style(page_text, llm_client)
-            except Exception as llm_error:
-                print(f"[LLM Error] {llm_error}")
-                return {"error": f"LLM failed: {str(llm_error)}"}
-
-            # Deduplicate social_media_links and brand_colors
-            unique_social_media_links = list(set(social_media_links)) if social_media_links else []
-            unique_brand_colors = list(set(brand_colors)) if brand_colors else []
-
             return {
                 "company_name": locals().get("company_name", ""),
                 "website_url": url,
@@ -124,12 +109,11 @@ def scrape_website(url: str, llm_client: LLMClient) -> dict:
                 "description": locals().get("description", ""),
                 "og_title": locals().get("og_title", ""),
                 "og_description": locals().get("og_description", ""),
-                "brand_colors": locals().get("unique_brand_colors", []),
-                "writing_style": locals().get("writing_style", ""),
-                "target_audience": locals().get("target_audience", ""),
-                "social_media_links": locals().get("unique_social_media_links", []),
+                "page_text": locals().get("page_text", ""),
+                "brand_colors": locals().get("brand_colors", []),
                 "image_urls": locals().get("image_urls", []),
                 "logo_urls": locals().get("logo_urls", []),
+                "social_media_links": locals().get("social_media_links", []),
                 "fonts": locals().get("fonts", []),  
             }
 

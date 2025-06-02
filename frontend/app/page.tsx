@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from "react";
+import BrandCard from "@/components/BrandCard";
 
 export default function Home() {
   const [url, setUrl] = useState('');
@@ -44,18 +45,7 @@ export default function Home() {
             <button disabled={loading || !url} className="disabled:opacity-50 mt-4 px-4 py-2 bg-[var(--button-color)] text-black rounded" type="submit">{loading ? 'Loading...' : 'Submit'}</button>    
           </form>
           {result && (
-            <div className="mt-12 text-black w-96 text-center">
-              <h2 className="font-bold text-lg">Brand Information</h2>
-              <p className="mt-2" >{result.company_name}</p>
-              <p className="mt-2">{result.website_url}</p>
-              <p className="mt-2">{result.target_audience}</p>
-              <p className="mt-2">{result.writing_style}</p>
-              <p className="mt-2">{result.title}</p>
-              <p className="mt-2">{result.description}</p>
-              <p className="mt-2">{result.og_title}</p>
-              <p className="mt-2">{result.og_description}</p>
-              <p className="mt-2">{result.brand_colors.map((color: string) => color).join(", ")}</p>
-            </div>
+            <BrandCard brand={result} />
           )}
         </div>
       </main>
