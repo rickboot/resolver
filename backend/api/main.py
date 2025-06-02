@@ -9,6 +9,7 @@ from fastapi.responses import JSONResponse
 
 app = FastAPI()
 
+#  todo: limit this to client in production
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

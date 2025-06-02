@@ -97,24 +97,35 @@ def scrape_website(url: str, llm_client: LLMClient) -> dict:
             )
             
             # userland text
-            page_text = page.eval_on_selector_all(
+            element_text_pairs = page.eval_on_selector_all(
                 'p, h1, h2, h3, h4, h5, h6',
-                'els => els.map(el => el.textContent.trim()).join("\\n")'
+                '''els => els.map(el => ({
+                    tag: el.tagName.toLowerCase(),
+                    text: el.textContent.trim()
+                }))'''
             )
 
+            print('element_text_pairs', element_text_pairs)
+            # element_text_pairs = page.eval_on_selector_all(
+            #     'p, h1, h2, h3, h4, h5, h6',
+            #     'els => els.map(el => el.textContent.trim()).join("\\n")'
+            # )
+
+            print('element_text_pairs', element_text_pairs)
+
             return {
-                "company_name": locals().get("company_name", ""),
+                "company_name": company_name,
                 "website_url": url,
-                "title": locals().get("title", ""),
-                "description": locals().get("description", ""),
-                "og_title": locals().get("og_title", ""),
-                "og_description": locals().get("og_description", ""),
-                "page_text": locals().get("page_text", ""),
-                "brand_colors": locals().get("brand_colors", []),
-                "image_urls": locals().get("image_urls", []),
-                "logo_urls": locals().get("logo_urls", []),
-                "social_media_links": locals().get("social_media_links", []),
-                "fonts": locals().get("fonts", []),  
+                "title": title,
+                "description": description,
+                "og_title": og_title,
+                "og_description": og_description,
+                "element_text_pairs": element_text_pairs,
+                "brand_colors": brand_colors,
+                "image_urls": image_urls,
+                "logo_urls": logo_urls,
+                "social_media_links": social_media_links,
+                "fonts": fonts,
             }
 
         except Exception as e:
